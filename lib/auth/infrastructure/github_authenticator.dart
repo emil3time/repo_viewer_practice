@@ -43,7 +43,10 @@ class GithubAuthenticator {
 
       if (storedCredentials != null) {
         if (storedCredentials.canRefresh && storedCredentials.isExpired) {
-          //TODO refresh
+          // no error handling for StateError in refresh() method, because above if statement excluded this option.
+          // Github token never expires - without this if - refresh() return StateError and app will crash.
+          final failureOrNewCredentials = await refresh(storedCredentials);
+          return failureOrNewCredentials.fold((l) => null, (r) => r);
         }
       }
 
@@ -119,4 +122,30 @@ class GithubAuthenticator {
       return left(const AuthFailure.storage());
     }
   }
+
+  Future<Either<AuthFailure, Credentials>> refresh(
+    Credentials credentials,
+  ) async {
+    try {
+      final refreshToken = await credentials.refresh(
+        identifier: clientId,
+        secret: clientSecret,
+        httpClient: GithubOAuthHttpClient(),
+      );
+
+      await _credentialsStorage.save(refreshToken);
+
+      return right(refreshToken);
+    } on FormatException {
+      return left(const AuthFailure.server());
+    } on AuthorizationException catch (e) {
+      return left(AuthFailure.server('${e.error} : ${e.description}'));
+    } on PlatformException {
+      return left(const AuthFailure.storage());
+    }
+  }
 }
+
+// !never catch (e) in StateError or another Error because this crash app try cath
+// !only Exceptions in official Flutter docs - but in some third party packages like Dio
+// !catching errors it's not a problem.
