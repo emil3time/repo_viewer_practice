@@ -119,7 +119,9 @@ class GithubAuthenticator {
       await _credentialsStorage.clear();
       return right(unit);
     } on PlatformException {
-      return left(const AuthFailure.storage());
+      return left(
+        const AuthFailure.storage(),
+      );
     }
   }
 
