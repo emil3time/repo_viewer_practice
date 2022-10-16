@@ -16,7 +16,8 @@
     "**/*.g.dart": true,
     "**/.gitkeep": true
   },
-  "explorerExclude.backup": {}
+  "explorerExclude.backup": {},
+  "java.configuration.updateBuildConfiguration": "automatic"
 
 
 }
