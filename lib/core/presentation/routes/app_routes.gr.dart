@@ -16,8 +16,9 @@ import 'package:flutter/material.dart' as _i6;
 
 import '../../../auth/presentation/authorization_page.dart' as _i4;
 import '../../../auth/presentation/sign_in_page.dart' as _i2;
+import '../../../github/repos/starred_repos/presentation/starred_repos_page.dart'
+    as _i3;
 import '../../../splash/splash_page.dart' as _i1;
-import '../../../starred_repo/starred_repo_page.dart' as _i3;
 
 class AppRouter extends _i5.RootStackRouter {
   AppRouter([_i6.GlobalKey<_i6.NavigatorState>? navigatorKey])
@@ -37,10 +38,10 @@ class AppRouter extends _i5.RootStackRouter {
         child: const _i2.SignInPage(),
       );
     },
-    StarredRepoRoute.name: (routeData) {
+    StarredReposRoute.name: (routeData) {
       return _i5.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i3.StarredRepoPage(),
+        child: const _i3.StarredReposPage(),
       );
     },
     AuthorizationRoute.name: (routeData) {
@@ -68,7 +69,7 @@ class AppRouter extends _i5.RootStackRouter {
           path: '/sign-in',
         ),
         _i5.RouteConfig(
-          StarredRepoRoute.name,
+          StarredReposRoute.name,
           path: '/starred',
         ),
         _i5.RouteConfig(
@@ -103,15 +104,15 @@ class SignInRoute extends _i5.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i3.StarredRepoPage]
-class StarredRepoRoute extends _i5.PageRouteInfo<void> {
-  const StarredRepoRoute()
+/// [_i3.StarredReposPage]
+class StarredReposRoute extends _i5.PageRouteInfo<void> {
+  const StarredReposRoute()
       : super(
-          StarredRepoRoute.name,
+          StarredReposRoute.name,
           path: '/starred',
         );
 
-  static const String name = 'StarredRepoRoute';
+  static const String name = 'StarredReposRoute';
 }
 
 /// generated route for

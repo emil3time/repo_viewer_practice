@@ -26,8 +26,8 @@ class GithubAuthenticator {
 
   GithubAuthenticator(this._credentialsStorage, this._dio);
 //TOdo deal witch clientSecret
-  static const clientId = 'xx';
-  static const clientSecret = 'xxx';
+  static const clientId = 'f06e63735c3545599d57';
+  static const clientSecret = 'd057d121728c151228bba36c7baf93581c5bea11';
   static const scopes = ['read:user', 'repo'];
   static final authorizationEndpoint =
       Uri.parse('https://github.com/login/oauth/authorize');
@@ -93,15 +93,15 @@ class GithubAuthenticator {
   }
 
   Future<Either<AuthFailure, Unit>> signOut() async {
-    final accessToken = _credentialsStorage
-        .read()
-        .then((credentials) => credentials?.accessToken);
-
-    final clientIdAndSecret = stringToBase64.encode('$clientId:$clientSecret');
-
     try {
+      final accessToken = await _credentialsStorage
+          .read()
+          .then((credentials) => credentials?.accessToken);
+
+      final clientIdAndSecret =
+          stringToBase64.encode('$clientId:$clientSecret');
       try {
-        _dio.deleteUri(
+        await _dio.deleteUri(
           revokedEndpoint,
           data: {'access_token': accessToken},
           options: Options(
@@ -116,9 +116,19 @@ class GithubAuthenticator {
         }
       }
 
+      return await clearCredentialsStorage();
+    } on PlatformException {
+      return left(
+        const AuthFailure.storage(),
+      );
+    }
+  }
+
+  Future<Either<AuthFailure, Unit>> clearCredentialsStorage() async {
+    try {
       await _credentialsStorage.clear();
       return right(unit);
-    } on PlatformException {
+    } on FormatException {
       return left(
         const AuthFailure.storage(),
       );

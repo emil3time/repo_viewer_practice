@@ -24,19 +24,26 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
   void initState() {
     if (Platform.isAndroid) {
       WebView.platform = SurfaceAndroidWebView();
+
     }
 
     super.initState();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
         child: WebView(
+
+
           javascriptMode: JavascriptMode.unrestricted,
           initialUrl: widget.authorizationUrl.toString(),
           onWebViewCreated: (controller) {
+
             controller.clearCache();
             CookieManager().clearCookies();
           },
@@ -45,6 +52,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                 .startsWith(GithubAuthenticator.redirectUrl.toString())) {
               widget.onAuthorizationCodeRedirectAttempt(
                 Uri.parse(navReq.url),
+
               );
 
               return NavigationDecision.prevent;

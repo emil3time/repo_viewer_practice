@@ -1,2 +1,39 @@
-GET https://api.github.com/user/starred?page=1
-Authorization: bearer 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
+
+@baseUrl = https://api.github.com
+
+
+@token = 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
+
+@acceptHeader = application/vnd.github.html+json
+
+GET {{baseUrl}}/user/starred
+  ?page=1
+Authorization: bearer {{token}}
+Accept: {{acceptHeader}}
+//If-None-Match:  W/"7db12aa56489872b3302c665d39b9310aa539ba1d9cdaa1bbd526111b14cd0af"
+###
+GET {{baseUrl}}/search/repositories
+  ?q=flutter
+  &page=1
+Authorization: bearer {{token}}
+Accept: {{acceptHeader}}
+###
+GET {{baseUrl}}/repos/flutter/flutter/readme
+Authorization: bearer {{token}}
+Accept: {{acceptHeader}}
+###
+PUT {{baseUrl}}/user/starred/emil3time/getx_shop_app
+Authorization: bearer {{token}}
+Accept: {{acceptHeader}}
+Content-Length: 0
+###
+DELETE {{baseUrl}}/user/starred/emil3time/getx_shop_app
+Authorization: bearer {{token}}
+Accept: {{acceptHeader}}
+Content-Length: 0
+###
+// check if repo is starred already y:204 n:404
+GET {{baseUrl}}/user/starred/emil3time/getx_shop_app
+Authorization: bearer {{token}}
+Accept: {{acceptHeader}}
+

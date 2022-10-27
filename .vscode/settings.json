@@ -14,7 +14,8 @@
     "**/Thumbs.db": true,
     "**/*.freezed.dart": true,
     "**/*.g.dart": true,
-    "**/.gitkeep": true
+    "**/.gitkeep": true,
+    "**/node_modules": true
   },
   "explorerExclude.backup": {},
   "java.configuration.updateBuildConfiguration": "automatic"
