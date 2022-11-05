@@ -1,9 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:repo_viewer/auth/shared/providers.dart';
+import 'package:repo_viewer/core/presentation/routes/app_routes.gr.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
-import 'package:repo_viewer/github/repos/starred_repos/presentation/paginated_repos_list_view.dart';
+import 'package:repo_viewer/github/repos/core/presentation/paginated_repos_list_view.dart';
+import 'package:repo_viewer/search/presentation/search_bar.dart';
 
 class StarredReposPage extends ConsumerStatefulWidget {
   const StarredReposPage({super.key});
@@ -18,7 +20,9 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
     super.initState();
 
     Future.microtask(
-      () => ref.read(starredRepoNotifierProvider.notifier).getNextRepoPage(),
+      () => ref
+          .read(starredRepoNotifierProvider.notifier)
+          .getNextStarredRepoPage(),
     );
 
     /* WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -27,7 +31,7 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
 
     Future.delayed(const Duration(seconds: 1)).then(
       (value) {
-        print('dsdsdsdsdsdsdsd');
+
         return ref.read(starredRepoNotifierProvider.notifier).getNextRepoPage();
       },
     ); */
@@ -36,21 +40,23 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Starred repo'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              ref.read(authNotifierProvider.notifier).signOut();
-            },
-            icon: const Icon(
-              MdiIcons.logoutVariant,
-            ),
-          )
-        ],
-      ),
-      body: const SafeArea(
-        child: PaginatedReposListView(),
+      body: SearchBar(
+        title: 'Starred repos',
+        hint: 'Search all repositories...',
+        onShouldNavigateToResultsPage: (searchedRepoName) {
+          AutoRouter.of(context)
+              .push(SearchedReposRoute(searchedRepoName: searchedRepoName));
+        },
+        onSignOutButtonPressed: () {
+          ref.read(authNotifierProvider.notifier).signOut();
+        },
+        body: PaginatedReposListView(
+          message: 'This is everything we found in your starred repo right now',
+          getNextPage: (ref) => ref
+              .read(starredRepoNotifierProvider.notifier)
+              .getNextStarredRepoPage(),
+          paginatedRepoNotifierProvider: starredRepoNotifierProvider,
+        ),
       ),
     );
   }

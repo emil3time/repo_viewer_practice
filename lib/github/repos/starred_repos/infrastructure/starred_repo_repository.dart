@@ -3,7 +3,7 @@ import 'package:repo_viewer/core/domain/fresh.dart';
 import 'package:repo_viewer/core/infrastructure/network_exceptions.dart';
 import 'package:repo_viewer/github/core/domain/github_failures.dart';
 import 'package:repo_viewer/github/core/domain/github_repo.dart';
-import 'package:repo_viewer/github/core/infrastructure/github_repo_dto.dart';
+import 'package:repo_viewer/github/repos/core/infrastructure/extensions.dart';
 import 'package:repo_viewer/github/repos/starred_repos/infrastructure/starred_repo_local_service.dart';
 import 'package:repo_viewer/github/repos/starred_repos/infrastructure/starred_repo_remote_service.dart';
 
@@ -22,11 +22,11 @@ class StarredRepoRepository {
       return right(
         await remotePageItems.when(
           noConnection: () async {
-
             return Fresh.no(
               //get data from local service
               await _localService.getPage(page).then((_) => _.toDomain()),
-              isNextPageAvailable: page < await _localService.numberOfLocalSavedPages(),
+              isNextPageAvailable:
+                  page < await _localService.numberOfLocalSavedPages(),
             );
           },
           noChanges: (maxPage) async {
@@ -42,7 +42,6 @@ class StarredRepoRepository {
 
             return Fresh.yes(
               data.toDomain(),
-              isNextPageAvailable: page < maxPage,
             );
           },
         ),
@@ -50,11 +49,5 @@ class StarredRepoRepository {
     } on RestApiException catch (e) {
       return left(GithubFailures.api(e.errorCode));
     }
-  }
-}
-
-extension DTOListToDomainList on List<GithubRepoDTO> {
-  List<GithubRepo> toDomain() {
-    return map((e) => e.toDomain()).toList();
   }
 }

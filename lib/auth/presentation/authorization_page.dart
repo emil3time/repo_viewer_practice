@@ -44,8 +44,8 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           initialUrl: widget.authorizationUrl.toString(),
           onWebViewCreated: (controller) {
 
-            controller.clearCache();
-            CookieManager().clearCookies();
+            // controller.clearCache();
+            // CookieManager().clearCookies();
           },
           navigationDelegate: (navReq) {
             if (navReq.url

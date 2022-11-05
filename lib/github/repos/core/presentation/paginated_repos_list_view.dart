@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:repo_viewer/core/presentation/toasts.dart';
 import 'package:repo_viewer/github/core/presentation/empty_repo_page.dart';
-import 'package:repo_viewer/github/core/shared/providers.dart';
-import 'package:repo_viewer/github/repos/starred_repos/application/starred_repo_notifier.dart';
-import 'package:repo_viewer/github/repos/starred_repos/presentation/failure_repo_tile.dart';
-import 'package:repo_viewer/github/repos/starred_repos/presentation/loading_repo_tile.dart';
-import 'package:repo_viewer/github/repos/starred_repos/presentation/repo_tile.dart';
+import 'package:repo_viewer/github/repos/core/application/paginated_repo_notifier.dart';
+import 'package:repo_viewer/github/repos/core/presentation/failure_repo_tile.dart';
+import 'package:repo_viewer/github/repos/core/presentation/loading_repo_tile.dart';
+import 'package:repo_viewer/github/repos/core/presentation/repo_tile.dart';
 
 class PaginatedReposListView extends ConsumerStatefulWidget {
+  final String message;
+
+  final AutoDisposeStateNotifierProvider<PaginatedRepoNotifier,
+      PaginatedRepoState> paginatedRepoNotifierProvider;
+
+  final void Function(WidgetRef ref) getNextPage;
+
   const PaginatedReposListView({
+    required this.message,
+    required this.getNextPage,
+    required this.paginatedRepoNotifierProvider,
     super.key,
   });
 
@@ -27,7 +37,7 @@ class _PaginatedReposListViewState
   Widget build(
     BuildContext context,
   ) {
-    ref.listen<StarredRepoState>(starredRepoNotifierProvider,
+    ref.listen<PaginatedRepoState>(widget.paginatedRepoNotifierProvider,
         (previous, state) {
       state.map(
         initial: (_) => canLoadNextPage = true,
@@ -47,7 +57,7 @@ class _PaginatedReposListViewState
       );
     });
 
-    final state = ref.watch(starredRepoNotifierProvider);
+    final state = ref.watch(widget.paginatedRepoNotifierProvider);
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
@@ -58,7 +68,7 @@ class _PaginatedReposListViewState
         if (canLoadNextPage && metrics.pixels >= limit) {
           canLoadNextPage = false;
 
-          ref.read(starredRepoNotifierProvider.notifier).getNextRepoPage();
+          widget.getNextPage(ref);
         }
 
         return false;
@@ -67,8 +77,8 @@ class _PaginatedReposListViewState
         loadSuccess: (repos, _) => repos.entity.isEmpty,
         orElse: () => false,
       )
-          ? const EmptyRepoPage(
-              message: 'This is everything we found there for you',
+          ? EmptyRepoPage(
+              message: widget.message,
             )
           : _PaginatedListView(state: state),
     );
@@ -76,7 +86,7 @@ class _PaginatedReposListViewState
 }
 
 class _PaginatedListView extends StatelessWidget {
-  final StarredRepoState state;
+  final PaginatedRepoState state;
 
   const _PaginatedListView({
     required this.state,
@@ -84,7 +94,14 @@ class _PaginatedListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //  final fsb = context.findAncestorWidgetOfExactType<FloatingSearchBar>()?.height;
+    final fsb = FloatingSearchBar.of(context)?.widget;
     return ListView.builder(
+      padding: fsb == null
+          ? EdgeInsets.zero
+          : EdgeInsets.only(
+              top: fsb.height + 8 + MediaQuery.of(context).padding.top ,
+            ),
       itemCount: state.map(
         initial: (_) => 0,
         loadingInProgress: (_) => _.repos.entity.length + _.itemsPerPage,
