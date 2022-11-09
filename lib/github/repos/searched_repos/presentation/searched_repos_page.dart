@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:repo_viewer/auth/shared/providers.dart';
 import 'package:repo_viewer/core/presentation/routes/app_routes.gr.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
@@ -35,49 +34,31 @@ class _SearchedReposPageState extends ConsumerState<SearchedReposPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.searchedRepoName,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              ref.read(authNotifierProvider.notifier).signOut();
-            },
-            icon: const Icon(
-              MdiIcons.logoutVariant,
-            ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SearchBar(
-          title: 'Starred repos',
-          hint: 'Search all repositories...',
-          onShouldNavigateToResultsPage: (searchedRepoName) {
-            /*  AutoRouter.of(context)
-                .pop(SearchedReposRoute(searchedRepoName: searchedRepoName));
+      body: SearchBar(
+        title: widget.searchedRepoName,
+        hint: 'Search all repositories...',
+        onShouldNavigateToResultsPage: (searchedRepoName) {
+          /*    AutoRouter.of(context)
+              .pop();
 
-            AutoRouter.of(context)
-                .push(SearchedReposRoute(searchedRepoName: searchedRepoName)); */
-
-            AutoRouter.of(context).pushAndPopUntil(
-              SearchedReposRoute(searchedRepoName: searchedRepoName),
-              predicate: (route) =>
-                  route.settings.name == StarredReposRoute.name,
-            );
-          },
-          onSignOutButtonPressed: () {
-            ref.read(authNotifierProvider.notifier).signOut();
-          },
-          body: PaginatedReposListView(
-            message:
-                'This is everything we found in your searched terms right now',
-            getNextPage: (ref) => ref
-                .read(searchedRepoNotifierProvider.notifier)
-                .getNextSearchedRepoPage(widget.searchedRepoName),
-            paginatedRepoNotifierProvider: searchedRepoNotifierProvider,
-          ),
+          AutoRouter.of(context)
+              .push(SearchedReposRoute(searchedRepoName: searchedRepoName));
+ */
+          AutoRouter.of(context).pushAndPopUntil(
+            SearchedReposRoute(searchedRepoName: searchedRepoName),
+            predicate: (route) => route.settings.name == StarredReposRoute.name,
+          );
+        },
+        onSignOutButtonPressed: () {
+          ref.read(authNotifierProvider.notifier).signOut();
+        },
+        body: PaginatedReposListView(
+          message:
+              'This is everything we found in your searched terms right now',
+          getNextPage: (ref) => ref
+              .read(searchedRepoNotifierProvider.notifier)
+              .getNextSearchedRepoPage(widget.searchedRepoName),
+          paginatedRepoNotifierProvider: searchedRepoNotifierProvider,
         ),
       ),
     );

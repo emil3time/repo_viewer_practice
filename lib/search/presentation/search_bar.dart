@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -57,7 +60,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
       _controller.close();
     }
 
-    void pushPageAndPutInHistory( String searchTerm) {
+    void pushPageAndPutInHistory(String searchTerm) {
       widget.onShouldNavigateToResultsPage(searchTerm);
 
       ref
@@ -69,6 +72,26 @@ class _SearchBarState extends ConsumerState<SearchBar> {
 
     return FloatingSearchBar(
       controller: _controller,
+      automaticallyImplyBackButton: false,
+      leadingActions: [
+        if (AutoRouter.of(context).canPop() &&
+            (Platform.isIOS || Platform.isMacOS))
+          IconButton(
+            splashRadius: 18,
+            onPressed: () {
+              AutoRouter.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios),
+          )
+        else if (AutoRouter.of(context).canPop())
+          IconButton(
+            splashRadius: 18,
+            onPressed: () {
+              AutoRouter.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back),
+          )
+      ],
       actions: [
         FloatingSearchBarAction.searchToClear(showIfClosed: false),
         FloatingSearchBarAction(
